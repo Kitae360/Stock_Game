@@ -13,5 +13,7 @@ Please follow read me instructions to run the code.
 2. put them in the same folder
 3. Run gui.py to run the template gui
 4. Run stock_game_interface.py to run command line code.
+5. Run test.py to run the unit tests
+6. Run argparse_1.py to run the skeleton code
 
 #About the code

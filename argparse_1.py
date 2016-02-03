@@ -5,21 +5,21 @@ class Argparse:
  def __init__(self):
   parser = argparse.ArgumentParser()
   parser.add_argument(
-	'-cp',
+	'-current_price',
 	nargs = '*', 
 	help = "show the current price and a corresponding time. Argument: Name of a stock")
 
   parser.add_argument(
-	'-ch',
+	'-price_change',
 	nargs = '*', 
 	help = "show the change of the price from the beginning to the end. Arguments: Name of the stock, Beginning(YYYY-MM-DD), Ending(YYYY-MM-DD)")
 
   args = parser.parse_args()
-  if args.cp != None:
-	list = args.cp
+  if args.current_price != None:
+	list = args.current_price
   	print data.current_price_function(list)
-  elif args.ch != None:
-	list = args.ch
+  elif args.price_change != None:
+	list = args.price_change
   	print data.change_of_price_function(list)
 
 Argparse()
