@@ -5,7 +5,7 @@ class Game(object):
 
 	def __init__(self):
 		self.money = 5000
-		self.player_stocks = {"YHOO": 10}
+		self.player_stocks = {}
 		self.stock_list = existing_stocks
 
 	def show_player_stocks(self):
@@ -14,11 +14,8 @@ class Game(object):
 	def show_money(self):
 		print self.money
 
-	def show_NASDAQ(self, character):
-		character = character.capitalize()
-		for name, quantity in self.stock_list.items():
-			if name[0] == character:
-				print (name, quantity)
+	def show_NASDAQ(self):
+		print self.stock_list
 
 	def check_stock_in_list(self, stock_name):
 		if self.player_stocks.get(stock_name) == None:
@@ -79,9 +76,8 @@ class Game_Runner(object):
 	def show_player_stocks(self):
 		self.game.show_player_stocks()
 
-	def show_NASDAQ(self, list):
-		character = list[0]
-		self.game.show_NASDAQ(character)
+	def show_NASDAQ(self):
+		self.game.show_NASDAQ()
 
 	def show_money(self):
 		self.game.show_money()

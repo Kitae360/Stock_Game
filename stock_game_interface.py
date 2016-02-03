@@ -51,11 +51,7 @@ class Interface:
 		  	game_1.show_player_stocks()
 
 		elif args.check_NASDAQ != None:
-			list = args.check_NASDAQ
-			if len(list) != 1:
-				print "Wrong number of argument"
-			else:
-		  		game_1.show_NASDAQ(list)
+			game_1.show_NASDAQ()
 
 		elif args.check_money != None:
 		  	game_1.show_money()
