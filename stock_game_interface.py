@@ -25,7 +25,7 @@ class Interface:
 		parser.add_argument(
 		'-check_NASDAQ',
 		nargs = '*',
-		help = "Check Stocks one the NASDAQ. One argument required: Fisrt Character of the stock")
+		help = "Check Stocks one the NASDAQ. One argument required")
 
 		parser.add_argument(
 		'-check_money',

@@ -8,61 +8,76 @@ class Game(object):
 		self.player_stocks = {}
 		self.stock_list = existing_stocks
 
+	#show the stocks that user owns
 	def show_player_stocks(self):
-		print self.player_stocks
+		return self.player_stocks
 
+	#show how much money 
 	def show_money(self):
-		print self.money
+		return self.money
 
+	#show list of all stocks in the NASDAQ
 	def show_NASDAQ(self):
-		print self.stock_list
+		return self.stock_list
 
+	#check if given stock is in the user's stock list
 	def check_stock_in_list(self, stock_name):
 		if self.player_stocks.get(stock_name) == None:
 			return False
 		else:
 			return True
 
+	#check if given stock is in the NASDAQ
 	def check_stock_exist_in_NASDAQ(self, stock_name):
 		if self.stock_list.get(stock_name) == None:
 			return False
 		else:
 			return True
 
+	#check if user owns less quantity of given name stock than the given quantity value
 	def quantity_check(self, name, quantity):
 		return int(self.player_stocks[name]) < int(quantity)
 
+	#returns the current value of the given stock
 	def check_current_price_stock(self, stock_name):
  		stock = Share('{}'.format(stock_name))
  		return stock.get_price()
 
+	#calculate the current price of the given stock at given quantity
 	def calculate_money(self, stock_name, quantity):
 		stock_price = self.check_current_price_stock(stock_name)
 		total_price = int(quantity) * float(stock_price)
 		return total_price
-
+	
+	#check if user has enough money to buy the given quantity of the given stock
 	def enough_money(self, stock_name, quantity):
 		return self.money >= self.calculate_money(stock_name, quantity)
 
+	#add money in the user's account by price of the given stock times the quantity
 	def add_money(self, stock_name, quantity):
 		total_price = self.calculate_money(stock_name, quantity)
 		self.money = self.money + total_price
 
+	#subtract money from the user's account by price of the given stock times the quantity
 	def subtract_money(self, stock_name, quantity):
 		total_price = self.calculate_money(stock_name, quantity)
 		self.money = self.money - total_price
 
+	#add given quantity amount of given stock in user's stock list
 	def add_stock_in_list(self, stock_name, quantity):
 		self.player_stocks[stock_name] = quantity
 
+	#add given quantity amount of given stock in user's stock list when user already owns the stock
 	def add_more_stock_in_list(self, stock_name, quantity):
 		user_owns = self.player_stocks[stock_name]
 		self.player_stocks[stock_name] = int(quantity) + int(user_owns)
 
+	#subtract given quantity amount of given stock in user's stock list
 	def subtract_stock_in_list(self, stock_name, quantity):
 		q = self.player_stocks[stock_name]
 		self.player_stocks[stock_name] = int(q) - int(quantity)
 	
+	#when the quantity of the stock is zero, stock gets erased from the user's stock list
 	def delete_list_value_zero(self):
 		for name, quantity in self.player_stocks.items():
 			if 0 == quantity:
@@ -74,13 +89,13 @@ class Game_Runner(object):
 		self.game = Game()
 
 	def show_player_stocks(self):
-		self.game.show_player_stocks()
+		print self.game.show_player_stocks()
 
 	def show_NASDAQ(self):
-		self.game.show_NASDAQ()
+		print self.game.show_NASDAQ()
 
 	def show_money(self):
-		self.game.show_money()
+		print self.game.show_money()
 
 	def buy_stock(self, list):
 		name = list[0]
