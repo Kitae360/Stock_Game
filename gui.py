@@ -1,68 +1,247 @@
 from gi.repository import Gtk
 import matplotlib.pyplot as plt
-import stock_game as game
+import stock_game as stock_game
+from list_stock import existing_stocks
 
-class ListWindow(Gtk.Window):
+class Transaction(Gtk.Window):
 
-    def __init__(self):
-	rules = game.Game()
-        Gtk.Window.__init__(self, title="Find NASDAQ")
-        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
+	def __init__(self):
 
-        self.set_border_width(10)
+	        Gtk.Window.__init__(self, title="Transaction")
+	        self.set_size_request(200, 100)
+	
+	        self.timeout_id = None
+	
+	        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
+	        self.add(vbox)
 
-	label = Gtk.Label("Type the first letter of the stock")
-	a = label.get_text()
-	vbox.pack_start(label, True, True, 0)
+		label = Gtk.Label("Type the name of the stock")
+	        vbox.pack_start(label, True, True, 0)
+	
+	        self.entry = Gtk.Entry()
+	        self.entry.set_text("Name")
+	        vbox.pack_start(self.entry, True, True, 0)
+	
+		label = Gtk.Label("Type the quantity of the stock")
+	        vbox.pack_start(label, True, True, 0)
+	
+		hbox = Gtk.Box(spacing=2)
+	        vbox.pack_start(hbox, True, True, 0)
 
-	self.entry = Gtk.Entry()
-	self.entry.set_text("Name")
-	vbox.pack_start(self.entry, True, True, 0)
+		adjustment = Gtk.Adjustment(0, 0, 1000, 1, 10, 0)
+		self.spinbutton = Gtk.SpinButton()
+		self.spinbutton.set_adjustment(adjustment)
+		hbox.pack_start(self.spinbutton, False, False, 0)
+        
+	        button = Gtk.Button.new_with_label("Buy")
+	        button.connect("clicked", self.buy)
+	        hbox.pack_start(button, True, True, 0)
 
-        List = rules.show_NASDAQ("{}".format(a))
-        Name = Gtk.ComboBoxText()
-        Name.set_entry_text_column(0)
-        Name.connect("changed", self.name_changed)
-        for part in List:
-        	Name.append_text(part)
+	        button = Gtk.Button.new_with_mnemonic("Sell")
+	        button.connect("clicked", self.sell)
+	        hbox.pack_start(button, True, True, 0)
+		
+		self.stock_manager = stock_game.Stock_Manager()
+		self.player = stock_game.Player()
+	
+	def buy(self, button):
+		quantity = self.spinbutton.get_value_as_int()
+		name = self.entry.get_text()
+		if self.stock_manager.check_stock_exist_in_NASDAQ(name):
+			price = float(self.stock_manager.check_current_price_stock(name))
+			total_price = price * int(quantity)
+			if self.player.enough_money(total_price):
+				if self.player.check_stock_in_list(name):
+					self.player.add_more_stock_in_list(name, quantity)
+				else: 
+					self.player.add_stock_in_list(name, quantity)
+					self.player.subtract_money(total_price)
+				dialog = Dialog_Success(self)
+	        		response = dialog.run()
+				dialog.destroy()
+			else:
+				dialog = Dialog_Money_Warning(self)
+				response = dialog.run()
+				dialog.destroy()
+		else:
+			dialog =  Dialog_Name_Warning(self)
+			response = dialog.run()
+			dialog.destroy()
 
-        vbox.pack_start(Name, False, False, 0)
+	def sell(self, button):
+		quantity = self.spinbutton.get_value_as_int()
+		name = self.entry.get_text()
+		if self.stock_manager.check_stock_exist_in_NASDAQ(name):
+			price = float(self.stock_manager.check_current_price_stock(name))
+			total_price = price * int(quantity)
+			if self.player.check_stock_in_list(name):
+				if self.player.quantity_check(name, quantity):
+					self.player.subtract_stock_in_list(name, quantity)
+					self.player.delete_list_value_zero()
+					self.player.add_money(total_price)
+					dialog = Dialog_Success(self)
+					response = dialog.run()
+					dialog.destroy()
+				else:
+					dialog =  Dialog_Quantity_Warning(self)
+					response = dialog.run()
+					dialog.destroy()
+			else:
+				dialog =  Dialog_No_Stock_Warning(self)
+				response = dialog.run()
+				dialog.destroy()
+		else:
+			dialog =  Dialog_Name_Warning(self)
+			response = dialog.run()
+			dialog.destroy()
 
-        self.add(vbox)
 
-    def name_changed(self, part):
-        text = part.get_active_text()
-        if text != None:
-            print("Selected: name=%s" % text)
+class NASDAQ_Search(Gtk.Window):
+
+	def __init__(self):
+		Gtk.Window.__init__(self, title="NASDAQ Search")
+		self.game = stock_game.Stock_Manager()
+
+		self.set_border_width(10)
+
+		name_store = Gtk.ListStore(str, str)
+		stocks = self.game.show_NASDAQ()
+		for stock in stocks:
+			name_store.append(stock)
+
+		vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
+
+		label = Gtk.Label("NASDAQ Search")
+		vbox.pack_start(label, True, True, 0)
+
+		name_combo = Gtk.ComboBox.new_with_model_and_entry(name_store)
+		name_combo.connect("changed", self.on_name_combo_changed)
+		name_combo.set_entry_text_column(1)
+		vbox.pack_start(name_combo, False, False, 0)
+		self.add(vbox)
+
+		button = Gtk.Button.new_with_label("Check Recent Price Graph")
+		button.connect("clicked", self.graph)
+		vbox.pack_start(button, True, True, 0)
+
+	def on_name_combo_changed(self, combo):
+		entry = combo.get_child()
+		print("Entered: %s" % entry.get_text())
+
+	def graph(self, button):
+	        dialog = Dialog_Warning(self)
+	        response = dialog.run()
+		dialog.destroy()
 
 class Dialog_Success(Gtk.Dialog):
 
-    def __init__(self, parent):
-	Gtk.Dialog.__init__(self, "Success", parent, 0,
-		(Gtk.STOCK_OK, Gtk.ResponseType.OK,
-		Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL))
-
-	self.set_default_size(100, 80)
-
-	label = Gtk.Label("Transaction is successfully done")
-
-	box = self.get_content_area()
-	box.add(label)
-	self.show_all()
-
-class Dialog_Warning(Gtk.Dialog):
-
 	def __init__(self, parent):
-	        Gtk.Dialog.__init__(self, "Warning", parent, 0,
-		(Gtk.STOCK_OK, Gtk.ResponseType.OK,
-		Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL))
+		Gtk.Dialog.__init__(self, "Success", parent, 0,
+			(Gtk.STOCK_OK, Gtk.ResponseType.OK))
+		self.player = stock_game.Player()
 
 		self.set_default_size(100, 80)
-
-		label = Gtk.Label("This transaction is not possible")
+		
+		stocks = self.player.show_player_stocks()
+		money = self.player.show_money()
+		label = Gtk.Label("Transaction was successfully done")
+		space = Gtk.Label("")
+		label_2 = Gtk.Label("Current Account:")
+		stock_label = Gtk.Label("Stock(s): {}".format(stocks))
+		money_label = Gtk.Label("Money: {}".format(money))
 
 		box = self.get_content_area()
 		box.add(label)
+		box.add(space)
+		box.add(label_2)
+		box.add(stock_label)
+		box.add(money_label)
+		self.show_all()
+
+
+class Dialog_Name_Warning(Gtk.Dialog):
+
+	def __init__(self, parent):
+	        Gtk.Dialog.__init__(self, "Warning", parent, 0,
+		(Gtk.STOCK_OK, Gtk.ResponseType.OK))
+		self.player = stock_game.Player()
+		self.stock_manager = stock_game.Stock_Manager()
+
+		self.set_default_size(100, 80)
+
+		label = Gtk.Label("Given stock name does not exist in the NASDAQ")
+
+		box = self.get_content_area()
+		box.add(label)
+		self.show_all()
+
+class Dialog_Quantity_Warning(Gtk.Dialog):
+
+	def __init__(self, parent):
+	        Gtk.Dialog.__init__(self, "Warning", parent, 0,
+		(Gtk.STOCK_OK, Gtk.ResponseType.OK))
+		self.player = stock_game.Player()
+		self.stock_manager = stock_game.Stock_Manager()
+
+		self.set_default_size(100, 80)
+
+		label = Gtk.Label("You do not have enough stocks to sell")
+
+		box = self.get_content_area()
+		box.add(label)
+		self.show_all()
+
+class Dialog_No_Stock_Warning(Gtk.Dialog):
+
+	def __init__(self, parent):
+	        Gtk.Dialog.__init__(self, "Warning", parent, 0,
+		(Gtk.STOCK_OK, Gtk.ResponseType.OK))
+		self.player = stock_game.Player()
+		self.stock_manager = stock_game.Stock_Manager()
+
+		self.set_default_size(100, 80)
+
+		label = Gtk.Label("You do not own a given stock")
+
+		box = self.get_content_area()
+		box.add(label)
+		self.show_all()
+
+class Dialog_Money_Warning(Gtk.Dialog):
+
+	def __init__(self, parent):
+	        Gtk.Dialog.__init__(self, "Warning", parent, 0,
+		(Gtk.STOCK_OK, Gtk.ResponseType.OK))
+		self.player = stock_game.Player()
+		self.stock_manager = stock_game.Stock_Manager()
+
+		self.set_default_size(100, 80)
+
+		label = Gtk.Label("You do not have enough money")
+
+		box = self.get_content_area()
+		box.add(label)
+		self.show_all()
+
+class Check_Account(Gtk.Dialog):
+
+	def __init__(self, parent):
+		Gtk.Dialog.__init__(self, "Player Account", parent, 0,
+			(Gtk.STOCK_OK, Gtk.ResponseType.OK))
+		self.player = stock_game.Player()
+
+		self.set_default_size(100, 80)
+		
+		stocks = self.player.show_player_stocks()
+		money = self.player.show_money()
+		label = Gtk.Label("Current Account:")
+		stock_label = Gtk.Label("Stock(s): {}".format(stocks))
+		money_label = Gtk.Label("Money: ${}".format(money))
+
+		box = self.get_content_area()
+		box.add(label)
+		box.add(stock_label)
+		box.add(money_label)
 		self.show_all()
 
 class Graph(object):
@@ -80,7 +259,7 @@ class Graph(object):
 class Window(Gtk.Window):
 
 	def __init__(self):
-		rules = game.Game()
+
 	        Gtk.Window.__init__(self, title="Stock Game")
 	        self.set_size_request(200, 100)
 	
@@ -97,57 +276,37 @@ class Window(Gtk.Window):
 	        switch.set_active(False)
         	vbox.pack_start(switch, True, True, 0)
 	
-		label = Gtk.Label("Type the name of the stock")
-	        vbox.pack_start(label, True, True, 0)
-	
-	        self.entry = Gtk.Entry()
-	        self.entry.set_text("Name")
-	        vbox.pack_start(self.entry, True, True, 0)
-	
-		label = Gtk.Label("Type the quantity of the stock")
-	        vbox.pack_start(label, True, True, 0)
-	
-	        self.entry = Gtk.Entry()
-	        self.entry.set_text("Quantity")
-	        vbox.pack_start(self.entry, True, True, 0)
-	
 	        hbox = Gtk.Box(spacing=6)
 	        vbox.pack_start(hbox, True, True, 0)
 	        
-	        button = Gtk.Button.new_with_label("Buy")
-	        button.connect("clicked", self.buy)
+	        button = Gtk.Button.new_with_label("Transaction")
+	        button.connect("clicked", self.transaction)
+	        hbox.pack_start(button, True, True, 0)
+
+	        button = Gtk.Button.new_with_mnemonic("Check Account")
+	        button.connect("clicked", self.check_account)
+	        hbox.pack_start(button, True, True, 0)
+
+	        button = Gtk.Button.new_with_mnemonic("Search NASDAQ")
+	        button.connect("clicked", self.search_nasdaq)
 	        hbox.pack_start(button, True, True, 0)
 	
-	        button = Gtk.Button.new_with_mnemonic("Sell")
-	        button.connect("clicked", self.sell)
-	        hbox.pack_start(button, True, True, 0)
-
-	        button = Gtk.Button.new_with_mnemonic("Find NASDAQ")
-	        button.connect("clicked", self.nasdaq)
-	        hbox.pack_start(button, True, True, 0)
-
-	        button = Gtk.Button.new_with_mnemonic("Check NASDAQ Graph")
-	        button.connect("clicked", self.nasdaq_graph)
-	        hbox.pack_start(button, True, True, 0)
-	
-	def buy(self, button):
-	        dialog = Dialog_Warning(self)
-	        response = dialog.run()
-		dialog.destroy()
-
-	def sell(self, button):
-	        dialog = Dialog_Success(self)
-	        response = dialog.run()
-		dialog.destroy()
-
-	def nasdaq(self, button):
-		win = ListWindow()
+	def transaction(self, button):
+		win = Transaction()
 		win.connect("delete-event", Gtk.main_quit)
 		win.show_all()
 		Gtk.main()
 
-	def nasdaq_graph(self, button):
-		Graph()
+	def check_account(self, button):
+	        dialog = Check_Account(self)
+	        response = dialog.run()
+		dialog.destroy()
+
+	def search_nasdaq(self, button):
+		win = NASDAQ_Search()
+		win.connect("delete-event", Gtk.main_quit)
+		win.show_all()
+		Gtk.main()
 
 	def switch_control(self, switch, gparam):
 	        if switch.get_active():

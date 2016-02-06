@@ -1,12 +1,39 @@
 from list_stock import existing_stocks
+from list_stock import test_stocks
 from yahoo_finance import Share
+import re
 
-class Game(object):
+class Stock_Manager(object):
+
+	def __init__(self):
+		self.NASDAQ = existing_stocks
+		self.example_stock_list = test_stocks
+
+	#show list of all stocks in the NASDAQ
+	def show_NASDAQ(self):
+		stock_list = []
+		for symbol, name in self.NASDAQ.items():
+			stock = [symbol, name]
+			stock_list.append(stock)
+		return stock_list
+
+	#check if given stock is in the NASDAQ
+	def check_stock_exist_in_NASDAQ(self, stock_name):
+		if self.NASDAQ.get(stock_name) == None:
+			return False
+		else:
+			return True
+
+	#returns the current value of the given stock
+	def check_current_price_stock(self, stock_name):
+ 		stock = Share('{}'.format(stock_name))
+ 		return stock.get_price()
+
+class Player(object):
 
 	def __init__(self):
 		self.money = 5000
-		self.player_stocks = {}
-		self.stock_list = existing_stocks
+		self.player_stocks = {"YHOO": 2}
 
 	#show the stocks that user owns
 	def show_player_stocks(self):
@@ -16,10 +43,6 @@ class Game(object):
 	def show_money(self):
 		return self.money
 
-	#show list of all stocks in the NASDAQ
-	def show_NASDAQ(self):
-		return self.stock_list
-
 	#check if given stock is in the user's stock list
 	def check_stock_in_list(self, stock_name):
 		if self.player_stocks.get(stock_name) == None:
@@ -27,41 +50,28 @@ class Game(object):
 		else:
 			return True
 
-	#check if given stock is in the NASDAQ
-	def check_stock_exist_in_NASDAQ(self, stock_name):
-		if self.stock_list.get(stock_name) == None:
-			return False
-		else:
-			return True
-
 	#check if user owns less quantity of given name stock than the given quantity value
 	def quantity_check(self, name, quantity):
-		return int(self.player_stocks[name]) < int(quantity)
-
-	#returns the current value of the given stock
-	def check_current_price_stock(self, stock_name):
- 		stock = Share('{}'.format(stock_name))
- 		return stock.get_price()
+		return int(self.player_stocks[name]) >= int(quantity)
 
 	#calculate the current price of the given stock at given quantity
-	def calculate_money(self, stock_name, quantity):
-		stock_price = self.check_current_price_stock(stock_name)
-		total_price = int(quantity) * float(stock_price)
+	def calculate_money(self, quantity, price):
+		total_price = int(quantity) * float(price)
 		return total_price
 	
 	#check if user has enough money to buy the given quantity of the given stock
-	def enough_money(self, stock_name, quantity):
-		return self.money >= self.calculate_money(stock_name, quantity)
+	def enough_money(self, price):
+		return self.money >= price
 
 	#add money in the user's account by price of the given stock times the quantity
-	def add_money(self, stock_name, quantity):
-		total_price = self.calculate_money(stock_name, quantity)
-		self.money = self.money + total_price
+	def add_money(self,price):
+		self.money = self.money + price
+		return self.money
 
 	#subtract money from the user's account by price of the given stock times the quantity
-	def subtract_money(self, stock_name, quantity):
-		total_price = self.calculate_money(stock_name, quantity)
-		self.money = self.money - total_price
+	def subtract_money(self, price):
+		self.money = self.money - price
+		return self.money
 
 	#add given quantity amount of given stock in user's stock list
 	def add_stock_in_list(self, stock_name, quantity):
@@ -83,47 +93,61 @@ class Game(object):
 			if 0 == quantity:
 				self.player_stocks.pop(name, quantity)
 
+	def player_buying(self, name, quantity, price):
+		if self.enough_money(price):
+			if self.check_stock_in_list(name):
+				self.add_more_stock_in_list(name, quantity)
+			else: self.add_stock_in_list(name, quantity)
+			self.subtract_money(price)
+		else: print "You do not have enough money to buy stocks"
+
+	def player_selling(self, name, quantity, price):
+		if self.check_stock_in_list(name):
+			if self.quantity_check(name, quantity):
+				self.subtract_stock_in_list(name, quantity)
+				self.delete_list_value_zero()
+				self.add_money(price)
+			else: print "You do not have enough stocks to sell"
+		else: print "You do not own a given stock"
+
+
 class Game_Runner(object):
 
 	def __init__(self):
-		self.game = Game()
+		self.stock_manager = Stock_Manager()
+		self.player = Player()
 
 	def show_player_stocks(self):
-		print self.game.show_player_stocks()
+		print self.player.show_player_stocks()
 
 	def show_NASDAQ(self):
-		print self.game.show_NASDAQ()
+		print self.stock_manager.show_NASDAQ()
 
 	def show_money(self):
-		print self.game.show_money()
+		print self.player.show_money()
 
 	def buy_stock(self, list):
 		name = list[0]
 		quantity = list[1]
-		if self.game.check_stock_exist_in_NASDAQ(name):
-			if self.game.enough_money(name, quantity):
-				if self.game.check_stock_in_list(name):
-					self.game.add_more_stock_in_list(name, quantity)
-				else:
-					self.game.add_stock_in_list(name, quantity)
-				self.game.subtract_money(name, quantity)
-				self.game.show_money()
-				self.game.show_player_stocks()
-
-			else: print "You do not have enough money"
-		else: print "Given stock does not exist"
+		if quantity.isdigit():
+			if self.stock_manager.check_stock_exist_in_NASDAQ(name):
+				price = float(self.stock_manager.check_current_price_stock(name))
+				total_price = price * int(quantity)
+				self.player.player_buying(name, quantity, total_price)
+				self.show_money()
+				self.show_player_stocks()
+			else: print "Given stock does not exist"
+		else: print "Quantity must be an integer"
 
 	def sell_stock(self, list):
 		name = list[0]
 		quantity = list[1]
-		if self.game.check_stock_in_list(name):
-			if self.game.quantity_check(name, quantity):
-				print "You do not have enough stocks"
-			else:
-				self.game.subtract_stock_in_list(name, quantity)
-				self.game.add_money(name, quantity)
-				self.game.delete_list_value_zero()
-				self.game.show_money()
-				self.game.show_player_stocks()
-		else:
-			print "You do not owne a stock with a given name"
+		if quantity.isdigit():
+			if self.stock_manager.check_stock_exist_in_NASDAQ(name):
+				price = float(self.stock_manager.check_current_price_stock(name))
+				total_price = price * int(quantity)
+				self.player.player_selling(name, quantity, total_price)
+				self.show_money()
+				self.show_player_stocks()
+			else: print "Given stock does not exist"
+		else: print "Quantity must be an integer"

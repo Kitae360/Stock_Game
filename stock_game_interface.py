@@ -1,10 +1,10 @@
 import argparse
-import stock_game as game
+import stock_game as stock_game
 
 class Interface:
 
 	def __init__(self):
-		game_1 = game.Game_Runner()
+		game = stock_game.Game_Runner()
 		parser = argparse.ArgumentParser()
 		
 		parser.add_argument(
@@ -38,22 +38,22 @@ class Interface:
 			if len(list) != 2:
 				print "Wrong number of arguments"
 			else:
-		  		print game_1.buy_stock(list)
+		  		print game.buy_stock(list)
 
 		if args.sell != None:
 			list = args.sell
 			if len(list) != 2:
 				print "Wrong number of arguments"
 			else:
-		  		print game_1.sell_stock(list)
+		  		print game.sell_stock(list)
 
 		elif args.check_owned_stocks != None:
-		  	game_1.show_player_stocks()
+		  	game.show_player_stocks()
 
 		elif args.check_NASDAQ != None:
-			game_1.show_NASDAQ()
+			game.show_NASDAQ()
 
 		elif args.check_money != None:
-		  	game_1.show_money()
+		  	game.show_money()
 
 Interface()
