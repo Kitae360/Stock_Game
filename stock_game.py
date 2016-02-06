@@ -33,7 +33,7 @@ class Player(object):
 
 	def __init__(self):
 		self.money = 5000
-		self.player_stocks = {"YHOO": 2}
+		self.player_stocks = {}
 
 	#show the stocks that user owns
 	def show_player_stocks(self):
