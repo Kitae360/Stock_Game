@@ -104,10 +104,14 @@ class NASDAQ_Search(Gtk.Window):
 
 		self.set_border_width(10)
 
+		self.stock_list = []
+		for name, symbol in self.game.show_NASDAQ().items():
+			stock = [symbol, name]
+			self.stock_list.append(stock)
+
 		name_store = Gtk.ListStore(str, str)
-		stocks = self.game.show_NASDAQ()
-		for stock in stocks:
-			name_store.append(stock)
+		for name in self.stock_list:
+			name_store.append(name)
 
 		vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
 
@@ -121,17 +125,34 @@ class NASDAQ_Search(Gtk.Window):
 		self.add(vbox)
 
 		button = Gtk.Button.new_with_label("Check Recent Price Graph")
-		button.connect("clicked", self.graph)
+		button.connect("clicked", self.draw_graph)
 		vbox.pack_start(button, True, True, 0)
+		self.input = ""
 
 	def on_name_combo_changed(self, combo):
 		entry = combo.get_child()
-		print("Entered: %s" % entry.get_text())
+		self.input = entry.get_text()
 
-	def graph(self, button):
-	        dialog = Dialog_Warning(self)
-	        response = dialog.run()
-		dialog.destroy()
+	def draw_graph(self, button):
+		graph = Graph()
+		graph.make_graph(self.input)
+
+class Graph(object):
+
+	def __init__(self):
+		self.game = stock_game.Stock_Manager()
+		self.stock_list = self.game.show_NASDAQ()
+
+	def make_graph(self, name):
+		print self.stock_list[name]
+		plt.plot([1,4,7,10], [21,14,44,7], 'b')
+		plt.ylabel('some numbers')
+		plt.xlabel('Days')
+		LABELS = ["Monday", "Tuesday", "Wednesday", "Thrusday"]
+		DayOfWeekOfCall = [1,4,7, 10]
+		plt.xticks(DayOfWeekOfCall, LABELS)
+		plt.axis([0, 15, 0, 45])
+		plt.show()
 
 class Dialog_Success(Gtk.Dialog):
 
@@ -148,7 +169,7 @@ class Dialog_Success(Gtk.Dialog):
 		space = Gtk.Label("")
 		label_2 = Gtk.Label("Current Account:")
 		stock_label = Gtk.Label("Stock(s): {}".format(stocks))
-		money_label = Gtk.Label("Money: {}".format(money))
+		money_label = Gtk.Label("Money: ${}".format(money))
 
 		box = self.get_content_area()
 		box.add(label)
@@ -244,18 +265,6 @@ class Check_Account(Gtk.Dialog):
 		box.add(money_label)
 		self.show_all()
 
-class Graph(object):
-
-	def __init__(self):
-		plt.plot([1,4,7,10], [21,14,44,7], 'b')
-		plt.ylabel('some numbers')
-		plt.xlabel('Days')
-		LABELS = ["Monday", "Tuesday", "Wednesday", "Thrusday"]
-		DayOfWeekOfCall = [1,4,7, 10]
-		plt.xticks(DayOfWeekOfCall, LABELS)
-		plt.axis([0, 15, 0, 45])
-		plt.show()
-
 class Window(Gtk.Window):
 
 	def __init__(self):
@@ -290,6 +299,8 @@ class Window(Gtk.Window):
 	        button = Gtk.Button.new_with_mnemonic("Search NASDAQ")
 	        button.connect("clicked", self.search_nasdaq)
 	        hbox.pack_start(button, True, True, 0)
+
+		self.hard_mode = False
 	
 	def transaction(self, button):
 		win = Transaction()
@@ -310,9 +321,9 @@ class Window(Gtk.Window):
 
 	def switch_control(self, switch, gparam):
 	        if switch.get_active():
-	        	state = "on"
+	        	self.hard_mode = True
 	        else:
-	        	state = "off"
+	        	self.hard_mode = False
 
 win = Window()
 win.connect("delete-event", Gtk.main_quit)

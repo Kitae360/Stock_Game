@@ -11,10 +11,9 @@ class Stock_Manager(object):
 
 	#show list of all stocks in the NASDAQ
 	def show_NASDAQ(self):
-		stock_list = []
-		for symbol, name in self.NASDAQ.items():
-			stock = [symbol, name]
-			stock_list.append(stock)
+		stock_list = {}
+		for symbol, name in existing_stocks.items():
+			stock_list[name] = symbol
 		return stock_list
 
 	#check if given stock is in the NASDAQ
