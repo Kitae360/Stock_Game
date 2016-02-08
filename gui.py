@@ -2,6 +2,9 @@ from gi.repository import Gtk
 import matplotlib.pyplot as plt
 import stock_game as stock_game
 from list_stock import existing_stocks
+from yahoo_finance import Share
+import time
+
 
 class Transaction(Gtk.Window):
 
@@ -9,6 +12,8 @@ class Transaction(Gtk.Window):
 
 	        Gtk.Window.__init__(self, title="Transaction")
 	        self.set_size_request(200, 100)
+		self.game = stock_game.Stock_Manager()
+		self.player = stock_game.Player()
 	
 	        self.timeout_id = None
 	
@@ -17,11 +22,21 @@ class Transaction(Gtk.Window):
 
 		label = Gtk.Label("Type the name of the stock")
 	        vbox.pack_start(label, True, True, 0)
-	
-	        self.entry = Gtk.Entry()
-	        self.entry.set_text("Name")
-	        vbox.pack_start(self.entry, True, True, 0)
-	
+
+		self.stock_list = []
+		for name, symbol in self.game.show_NASDAQ().items():
+			stock = [symbol, name]
+			self.stock_list.append(stock)
+
+		name_store = Gtk.ListStore(str, str)
+		for name in self.stock_list:
+			name_store.append(name)
+
+		name_combo = Gtk.ComboBox.new_with_model_and_entry(name_store)
+		name_combo.connect("changed", self.on_name_combo_changed)
+		name_combo.set_entry_text_column(1)
+		vbox.pack_start(name_combo, False, False, 0)
+
 		label = Gtk.Label("Type the quantity of the stock")
 	        vbox.pack_start(label, True, True, 0)
 	
@@ -40,15 +55,21 @@ class Transaction(Gtk.Window):
 	        button = Gtk.Button.new_with_mnemonic("Sell")
 	        button.connect("clicked", self.sell)
 	        hbox.pack_start(button, True, True, 0)
-		
-		self.stock_manager = stock_game.Stock_Manager()
-		self.player = stock_game.Player()
+
+		self.input = ""
 	
 	def buy(self, button):
 		quantity = self.spinbutton.get_value_as_int()
-		name = self.entry.get_text()
-		if self.stock_manager.check_stock_exist_in_NASDAQ(name):
-			price = float(self.stock_manager.check_current_price_stock(name))
+		stock_list = []
+		for name, symbol in self.game.show_NASDAQ().items():
+			stock_list.append(name)
+		
+		if self.input in stock_list:
+			stock_list = {}
+			for symbol, name in existing_stocks.items():
+				stock_list[name] = symbol
+			name = stock_list[self.input]
+			price = float(self.game.check_current_price_stock(name))
 			total_price = price * int(quantity)
 			if self.player.enough_money(total_price):
 				if self.player.check_stock_in_list(name):
@@ -70,9 +91,16 @@ class Transaction(Gtk.Window):
 
 	def sell(self, button):
 		quantity = self.spinbutton.get_value_as_int()
-		name = self.entry.get_text()
-		if self.stock_manager.check_stock_exist_in_NASDAQ(name):
-			price = float(self.stock_manager.check_current_price_stock(name))
+		stock_list = []
+		for name, symbol in self.game.show_NASDAQ().items():
+			stock_list.append(name)
+		
+		if self.input in stock_list:
+			stock_list = {}
+			for symbol, name in existing_stocks.items():
+				stock_list[name] = symbol
+			name = stock_list[self.input]
+			price = float(self.game.check_current_price_stock(name))
 			total_price = price * int(quantity)
 			if self.player.check_stock_in_list(name):
 				if self.player.quantity_check(name, quantity):
@@ -83,7 +111,7 @@ class Transaction(Gtk.Window):
 					response = dialog.run()
 					dialog.destroy()
 				else:
-					dialog =  Dialog_Quantity_Warning(self)
+					dialog = Dialog_Quantity_Warning(self)
 					response = dialog.run()
 					dialog.destroy()
 			else:
@@ -94,6 +122,11 @@ class Transaction(Gtk.Window):
 			dialog =  Dialog_Name_Warning(self)
 			response = dialog.run()
 			dialog.destroy()
+
+
+	def on_name_combo_changed(self, combo):
+		entry = combo.get_child()
+		self.input = entry.get_text()
 
 
 class NASDAQ_Search(Gtk.Window):
@@ -134,25 +167,110 @@ class NASDAQ_Search(Gtk.Window):
 		self.input = entry.get_text()
 
 	def draw_graph(self, button):
+		stock_list = []
+		for name, symbol in self.game.show_NASDAQ().items():
+			stock_list.append(name)
+		
+		if self.input in stock_list:
+			stock_list = {}
+			for symbol, name in existing_stocks.items():
+				stock_list[name] = symbol
+			symbol = stock_list[self.input]
+			win = Calendar()
+			win.symbol_input(symbol)
+			win.connect("delete-event", Gtk.main_quit)
+			win.show_all()
+			Gtk.main()
+		else:
+			dialog =  Dialog_Name_Warning(self)
+			response = dialog.run()
+			dialog.destroy()
+
+class Calendar(Gtk.Window):
+
+	def __init__(self):
+
+	        Gtk.Window.__init__(self, title="Calendar")
+	        self.set_size_request(200, 100)
+	
+	        self.timeout_id = None
+	
+	        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+	        self.add(vbox)
+
+		label = Gtk.Label("Select the Start Date")
+	        vbox.pack_start(label, True, True, 0)
+	
+	        hbox = Gtk.Box(spacing=6)
+	        vbox.pack_start(hbox, True, True, 0)
+		
+		calendar = Gtk.Calendar()
+		calendar.connect("day-selected", self.calendar_input)
+		hbox.pack_start(calendar, True, True, 0)
+
+	        button = Gtk.Button.new_with_label("Graph")
+	        button.connect("clicked", self.click)
+	        vbox.pack_start(button, True, True, 0)
+
+		self.start_date = ""
+		self.symbol = ""
+
+	def calendar_input(self, calendar):
+		date = calendar.get_date()
+		self.start_date = date
+
+	def click(self, button):
 		graph = Graph()
-		graph.make_graph(self.input)
+		graph.collece_graph_data(self.symbol, self.start_date)
+		graph.price_list_collect()
+		graph.draw_graph()
+
+	def symbol_input(self, symbol):
+		self.symbol = symbol
 
 class Graph(object):
 
 	def __init__(self):
 		self.game = stock_game.Stock_Manager()
 		self.stock_list = self.game.show_NASDAQ()
+		self.selected_date = ""
+		self.today = ""
+		self.symbol = ""
+		self.price_list = []
 
-	def make_graph(self, name):
-		print self.stock_list[name]
-		plt.plot([1,4,7,10], [21,14,44,7], 'b')
-		plt.ylabel('some numbers')
-		plt.xlabel('Days')
-		LABELS = ["Monday", "Tuesday", "Wednesday", "Thrusday"]
-		DayOfWeekOfCall = [1,4,7, 10]
-		plt.xticks(DayOfWeekOfCall, LABELS)
-		plt.axis([0, 15, 0, 45])
+	def collece_graph_data(self, symbol, date):
+		year = date[0]
+		month = date[1] + 1
+		day = date[2]
+		self.selected_date = "{}-{}-{}".format(year, month, day)
+		self.today = (time.strftime("%Y-%m-%d"))
+		self.symbol = symbol
+
+	def price_list_collect(self):
+		stock = Share(self.symbol)
+		history = stock.get_historical(self.selected_date, self.today)
+		self.data_num = len(history)
+		while self.data_num > 0:
+			one = history[self.data_num -1]
+			price = one['High']
+			self.price_list.append(float(price))
+			self.data_num = self.data_num - 1
+
+	def draw_graph(self):
+		average_price = sum(self.price_list)/float(len(self.price_list))
+		number = int(len(self.price_list))
+		x_axis = []
+		input_num = 1
+		while number > 0:
+			x_axis.append(input_num)
+			input_num = input_num + 1
+			number = number - 1
+		plt.plot(x_axis, self.price_list, 'b')
+		plt.ylabel('Price')
+		plt.xlabel('Days Ago')
+		plt.axis([int(len(self.price_list)) + 1, 0, min(self.price_list) - 0.5, max(self.price_list) + 0.5])
 		plt.show()
+
 
 class Dialog_Success(Gtk.Dialog):
 

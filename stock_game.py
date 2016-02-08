@@ -2,6 +2,7 @@ from list_stock import existing_stocks
 from list_stock import test_stocks
 from yahoo_finance import Share
 import re
+import pickle
 
 class Stock_Manager(object):
 

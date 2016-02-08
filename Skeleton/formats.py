@@ -17,5 +17,3 @@ def check_time_all_integers(string):
   day = list_of_integers[2]
   return year.isdigit() and month.isdigit() and day.isdigit()
 
-
-print "12.12".isdigit()
