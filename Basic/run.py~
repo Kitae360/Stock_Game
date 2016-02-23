@@ -1,0 +1,61 @@
+import argparse
+import sys
+sys.path.insert(0, '../Common')
+import stock_game.py as stock_game
+
+class Interface:
+
+	def __init__(self):
+		game = stock_game.Game_Runner()
+		parser = argparse.ArgumentParser()
+		
+		parser.add_argument(
+		'-buy',
+		nargs = '*', 
+		help = "Requires two arguments, name of the stock and quantity")
+
+		parser.add_argument(
+		'-sell',
+		nargs = '*', 
+		help = "Requires two arguments, name of the stock and quantity")
+
+		parser.add_argument(
+		'-check_owned_stocks',
+		nargs = '*', 
+		help = "Check user's stocks. NO arguments required")
+
+		parser.add_argument(
+		'-check_NASDAQ',
+		nargs = '*',
+		help = "Check Stocks one the NASDAQ. NO argument required")
+
+		parser.add_argument(
+		'-check_money',
+		nargs = '*', 
+		help = "Check money that user has. NO arguments required")
+
+		args = parser.parse_args()
+		if args.buy != None:
+			list = args.buy
+			if len(list) != 2:
+				print "Wrong number of arguments"
+			else:
+		  		print game.buy_stock(list)
+
+		if args.sell != None:
+			list = args.sell
+			if len(list) != 2:
+				print "Wrong number of arguments"
+			else:
+		  		print game.sell_stock(list)
+
+		elif args.check_owned_stocks != None:
+		  	game.show_player_stocks()
+
+		elif args.check_NASDAQ != None:
+			game.show_NASDAQ()
+
+		elif args.check_money != None:
+		  	game.show_money()
+
+Interface()
