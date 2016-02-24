@@ -2,7 +2,7 @@
 
 ## Abstract
 
-In this game, users are able to invest virtual money into the NASDAQ stock markets. Users are able to buy, sell stocks, check the bank account and the stock account, and check list of stocks in the NASDAQ and the price movement of the chosen stock.
+Users will be able to invest virtual money into the NASDAQ stock market. In this game, users will be able to make transaction and select and display the price data
 
 ## Background
 
@@ -16,22 +16,22 @@ In economic classes, teachers and professors always do the stock investing proje
 
 ### Skeleton:
 1. Demonstrate that I can manually pull data from the stock market library for a chosen length of time
-..* Data includes:
-..* current price, and a corresponding time
-..* change of the price from the beginning to the end
++ Data includes:
++ current price, and a corresponding time
++ change of the price from the beginning to the end
 
 2. Be able to demonstrate the usage of the GUI. I can show:
-..* Graph that is hard coded
-..* Buttons, text input and labels
++ Graph that is hard coded
++ Buttons, text input and labels
 
 ### Basic:
 1. I will build a text based commend line game. In this game user can:
-..* Start the game with $5000
-..* Buy sell stock
-..* Check the list of stocks that user owns
-..* Check the amount of money that the user owns
-..* Check the name and symbol of existing stocks in the NASDAQ
-..* Save the game
++ Start the game with $5000
++ Buy sell stock
++ Check the list of stocks that user owns
++ Check the amount of money that the user owns
++ Check the name and symbol of existing stocks in the NASDAQ
++ Save the game
 
 ### Solid:
 1. Game will display everything that is on Basic and Solid using GUI to make a game. 
@@ -42,10 +42,10 @@ In economic classes, teachers and professors always do the stock investing proje
 1. I will add more features to make the game more fun to play. Features include:
 2. User can choose the difficultly of the game; easy or hard:
 3. In easy mode:
-..* game will be the same as what it is been like.
++ game will be the same as what it is been like.
 4. In hard mode: 
-..* user will start the game with $2500
-..* user will pay fees and taxes for every transitions	
++ user will start the game with $2500
++ user will pay fees and taxes for every transitions	
 
 ## Tools
 
