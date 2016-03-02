@@ -2,75 +2,74 @@
 
 ## Abstract
 
-Users will be able to invest virtual money into the NASDAQ stock market. In this game, users will be able to make transaction and select and display the price data
+In the Stock Market Game, users will be able to invest virtual money into the NASDAQ stock market. Users will also be able to make transactions, select, and display the price data.
 
 ## Background
 
-I have seen stock investing games and know what features are necessary and can be really helpful. Programming wise, I have used Python and Python GIU to make a small game. However, it was a pretty small project and it did not require any APIs. 
+I have seen stock investing games and know what features are necessary that can be helpful. The Programming language I am familiar with is Python, and I am experienced with Python GUI And APIs. However, it was a pretty small project and it did not require many APIs. 
 
 ## Significance
 
-In economic classes, teachers and professors always do the stock investing project and use the same website for it. What I realized is that people are investing in stocks purely with the luck because there were no features like checking price movement graph or nice built in function to find a stock. I believe that this game will provide people chances to actually spend time to find promising stocks and engage in the project. Also, this project will give me an opportunity to learn more about Object-Oriented programing and how to find and use API, libraries, and documentations. Also I will gain experiences to become a better programmer.
+In economics classes, teachers and professors often assign a stock investing project. From what I saw, the software they are using for the project is missing features such as price data graph and stock finding functions. The proposed game will give people a chance to spend time and find promising stocks and engage with the project. This project will also give me an opportunity to learn more about Object-Oriented programing and how to find and use APIs, libraries, and documentations more efficiently. Through this project, I aspire to become a better programmer.
 
 ## Deliverables
 
 ### Skeleton:
-1. Demonstrate that I can manually pull data from the stock market library for a chosen length of time
-+ Data includes:
-+ current price, and a corresponding time
-+ change of the price from the beginning to the end
+1. I will create prototype to demonstrate manually pulling data using the stock market API that I have selected
+* Data includes:
+* The current price, and a corresponding time
+* The change of the price from the beginning to the end
 
-2. Be able to demonstrate the usage of the GUI. I can show:
-+ Graph that is hard coded
-+ Buttons, text input and labels
+2. The GUI will demonstrate
++ Generating a graph populated with hard coded data
++ Widgets such as, buttons, text input, and labels
 
 ### Basic:
-1. I will build a text based commend line game. In this game user can:
+1. I will build a text based command line game. In this game the player can:
 + Start the game with $5000
-+ Buy sell stock
-+ Check the list of stocks that user owns
-+ Check the amount of money that the user owns
++ Buy and sell stock
++ Check the list of stocks that they own
++ Check the amount of money that respective user owns
 + Check the name and symbol of existing stocks in the NASDAQ
 + Save the game
 
 ### Solid:
-1. Game will display everything that is on Basic and Solid using GUI to make a game. 
-2. In this game user can do everything that is done in Basic. Also:
-3. User can select a stock at a time and check the change of the price graph of it.
+1. Solid features will include:
+* A GUI that replaces the command line interface
+* The player can select a stock at any time and check the change of its respective price graph.
+* Stock price graph generation
 
 ### Awesome:
-1. I will add more features to make the game more fun to play. Features include:
-2. User can choose the difficultly of the game; easy or hard:
-3. In easy mode:
-+ game will be the same as what it is been like.
-4. In hard mode: 
-+ user will start the game with $2500
-+ user will pay fees and taxes for every transitions	
+1. Awesome features include:
+* Difficulty setting feature
+* In easy mode:
+* game will be the same as the game in solid.
+* In hard mode: 
+* user will start the game with $2500
+* user will pay fees (10% of the price) and taxes (10% of the price) for every transition	
 
 ## Tools
 
-I did some research to find APIs and libraries that can help me build this game. GUI wise, “I” found the library called GTK which has lots of useful built in features such as buttons, menus, and labels. Stock market wise, I found the API called Yahoo-Finance which lets me pull stock data such as current price, and the historical data of the chosen stock. Also, I am going to use matplotlib to display the price movement graph of the stock. Programming background wise, I have used Python and python GUI to build a small game.
+There are a number of APIs and libraries which could be helpful in building the game. I found the library called GTK which has built in widgets such as buttons, menus, and labels. For stock market API, I am going to use Yahoo-Finance which lets me pull stock data such as current price, and the historical data of the chosen stock. Also, I am going to use matplotlib to display the price movement graph of the stock. 
 
 ## Problems
 
-As I mentioned earlier, I have not done any projects that involve any APIs or libraries. Also I still have hard time with separating functions into different classes. To resolve these problems, I am going to read more documentations to figure out what kind of features are in chosen APIs and do lots of testings to find out how they behave. Also I am going to look at other people's code to learn how object-oriented project should look like.
+I still have a hard time with separating functions into different classes. To resolve this problem, I am going to review the UML diagram for my code and check if classes and functions are keeping the single responsibility priciple. Another problem is that I am not completely familar with the API I am going to use for this project. In order to solve this problem, I am going to read more documentation to figure out what kind of features are in the chosen API and do lots of testing to find out how they behave.
 
 ## References
 
 **Yahoo-Finance:**
 
-[https://pypi.python.org/pypi/yahoo-finance/1.2.1]
+[1] Pypi.python.org, "yahoo-finance 1.2.1 : Python Package Index", 2016. [Online]. Available: https://pypi.python.org/pypi/yahoo-finance/1.2.1. [Accessed: 27- Jan- 2016]
 
 **Matplotlib:**
-
-[http://matplotlib.org/users/pyplot_tutorial.html]
+[2] Matplotlib.org, "Pyplot tutorial — Matplotlib 1.5.1 documentation", 2016. [Online]. Available: http://matplotlib.org/users/pyplot_tutorial.html. [Accessed: 17- Feb- 2016].
 
 **Gosu:**
-
-[https://gosu-lang.github.io/]
+[3] Gosu-lang.github.io, "The Gosu Programming Language", 2016. [Online]. Available: https://gosu-lang.github.io/. [Accessed: 17- Feb- 2016].
 
 **GTK:**
-[https://python-gtk-3-tutorial.readthedocs.org/en/latest/]
+[4] Python-gtk-3-tutorial.readthedocs.org, "The Python GTK+ 3 Tutorial — Python GTK+ 3 Tutorial 3.4 documentation", 2016. [Online]. Available: https://python-gtk-3-tutorial.readthedocs.org/en/latest/. [Accessed: 17- Feb- 2016].
 
 **Python Argparse:**
-[https://docs.python.org/3/library/argparse.html]
+[5] Docs.python.org, "16.4. argparse — Parser for command-line options, arguments and sub-commands — Python 3.5.1 documentation", 2016. [Online]. Available: https://docs.python.org/3/library/argparse.html. [Accessed: 17- Feb- 2016].
