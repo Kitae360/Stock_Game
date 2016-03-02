@@ -16,37 +16,37 @@ In economics classes, teachers and professors often assign a stock investing pro
 
 ### Skeleton:
 1. I will create prototype to demonstrate manually pulling data using the stock market API that I have selected
-* Data includes:
-* The current price, and a corresponding time
-* The change of the price from the beginning to the end
+... Data includes:
+... The current price, and a corresponding time
+... The change of the price from the beginning to the end
 
 2. The GUI will demonstrate
-+ Generating a graph populated with hard coded data
-+ Widgets such as, buttons, text input, and labels
+... Generating a graph populated with hard coded data
+... Widgets such as, buttons, text input, and labels
 
 ### Basic:
 1. I will build a text based command line game. In this game the player can:
-+ Start the game with $5000
-+ Buy and sell stock
-+ Check the list of stocks that they own
-+ Check the amount of money that respective user owns
-+ Check the name and symbol of existing stocks in the NASDAQ
-+ Save the game
+... Start the game with $5000
+... Buy and sell stock
+... Check the list of stocks that they own
+... Check the amount of money that respective user owns
+... Check the name and symbol of existing stocks in the NASDAQ
+... Save the game
 
 ### Solid:
 1. Solid features will include:
-* A GUI that replaces the command line interface
-* The player can select a stock at any time and check the change of its respective price graph.
-* Stock price graph generation
+... A GUI that replaces the command line interface
+... The player can select a stock at any time and check the change of its respective price graph.
+... Stock price graph generation
 
 ### Awesome:
 1. Awesome features include:
-* Difficulty setting feature
-* In easy mode:
-* game will be the same as the game in solid.
-* In hard mode: 
-* user will start the game with $2500
-* user will pay fees (10% of the price) and taxes (10% of the price) for every transition	
+... Difficulty setting feature
+... In easy mode:
+... game will be the same as the game in solid.
+... In hard mode: 
+... user will start the game with $2500
+... user will pay fees (10% of the price) and taxes (10% of the price) for every transition	
 
 ## Tools
 
