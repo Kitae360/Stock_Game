@@ -4,17 +4,14 @@ Please follow read me instructions to run the code.
 
 # Installation
 - **Python 2.7**
-- **GTK 3+**
-- `apt-get install libgtk-3-dev`
-- **yahoo-finance 1.2.1**
-- `pip install yahoo-finance`
-- **Matplotlib 1.5.1**
-- `pip install matplotlib`
+- **GTK 3+:** `apt-get install libgtk-3-dev`
+- **yahoo-finance 1.2.1:** `pip install yahoo-finance`
+- **Matplotlib 1.5.1:** `pip install matplotlib`
 
 # How to run
-- **How to run the command line based code:**
+**How to run the command line based code:**
 - Run run.py in Basic file
-- **How to run the GUI based code:**
+**How to run the GUI based code:**
 - Run run.py in Solid_Awesome file
 
 # About the Code
