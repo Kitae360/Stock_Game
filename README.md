@@ -3,17 +3,20 @@ This game is for CPTR 398 class.
 Please follow read me instructions to run the code.
 
 # Installation
-1. Python 2.7 or higher
+1. Python 2.7
 2. GTK 3+
-3. yahoo-finance 1.1.4
+- `apt-get install libgtk-3-dev`
+3. yahoo-finance 1.2.1
+- `pip install yahoo-finance`
 4. Matplotlib 1.5.1
+- `pip install matplotlib`
 
 # How to run
-1. Download all files that are uploaded
-2. put them in the same folder
-3. Run gui.py to run the template gui
-4. Run stock_game_interface.py to run command line code.
-5. Run test.py to run the unit tests
-6. Run argparse_1.py to run the skeleton code
+1. How to run the command line based code
+- Run run.py in Basic file
+2. How to run the GUI based code
+- RUn run.py in Solid_Awesome file
 
-#About the code
+# About the Code
+1. Comman libraries are stored in the Common file
+2. Testing for the comman libraries are also stored in the Common file
