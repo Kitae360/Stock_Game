@@ -16,7 +16,7 @@ In economics classes, teachers and professors often assign a stock investing pro
 
 ### Skeleton:
 **I will create prototype to demonstrate manually pulling data using the stock market API that I have selected**
-- Data includes:
+Data includes:
 - The current price, and a corresponding time
 - The change of the price from the beginning to the end
 
@@ -41,10 +41,10 @@ In economics classes, teachers and professors often assign a stock investing pro
 
 ### Awesome:
 **Awesome features include:**
-Difficulty setting feature
-**In easy mode:**
+- Difficulty setting feature
+In easy mode:
 - game will be the same as the game in solid.
-- In hard mode: 
+In hard mode: 
 - user will start the game with $2500
 - user will pay fees (10% of the price) and taxes (10% of the price) for every transition	
 
