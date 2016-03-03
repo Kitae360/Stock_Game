@@ -1,5 +1,6 @@
 # Stock Game
-This game is for CPTR 398 class. 
+This game is for CPTR 398 class.
+ 
 Please follow read me instructions to run the code.
 
 # Installation
@@ -11,6 +12,7 @@ Please follow read me instructions to run the code.
 # How to run
 **How to run the command line based code:**
 - Run run.py in Basic file
+
 **How to run the GUI based code:**
 - Run run.py in Solid_Awesome file
 
