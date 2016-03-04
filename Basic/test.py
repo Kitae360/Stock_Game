@@ -1,4 +1,6 @@
 import unittest
+import sys
+sys.path.insert(0, '../Common')
 from stock_game import *
 
 class Test(unittest.TestCase):
