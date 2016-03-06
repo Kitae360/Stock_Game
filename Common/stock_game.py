@@ -3,12 +3,9 @@ from list_stock import test_stocks
 from yahoo_finance import Share
 import re
 import pickle
+import os.path
 
 class Stock_Manager(object):
-
-	def __init__(self):
-		self.NASDAQ = existing_stocks
-		self.example_stock_list = test_stocks
 
 	#show list of all stocks in the NASDAQ
 	def show_NASDAQ(self):
@@ -19,7 +16,7 @@ class Stock_Manager(object):
 
 	#check if given stock is in the NASDAQ
 	def check_stock_exist_in_NASDAQ(self, stock_name):
-		if self.NASDAQ.get(stock_name) == None:
+		if existing_stocks.get(stock_name) == None:
 			return False
 		else:
 			return True
@@ -32,9 +29,26 @@ class Stock_Manager(object):
 class Player(object):
 
 	def __init__(self):
-		self.money = 5000
-		self.player_stocks = {}
+		if os.path.isfile('whatgame.pickle'):
+			with open('whatgame.pickle', 'rb') as handle:
+				output = pickle.load(handle)
+				self.pickle = output
+		else:
+			self.pickle = ""
 
+		if os.path.isfile('{}.pickle'.format(self.pickle)):
+			with open('{}.pickle'.format(self.pickle), 'rb') as handle:
+				try:
+					output = pickle.load(handle)
+  					self.money = output[0]
+					self.player_stocks = output[1]
+				except EOFError:
+		  			self.money = 5000
+					self.player_stocks = {}
+		else:
+  			self.money = 5000
+			self.player_stocks = {}
+	
 	#show the stocks that user owns
 	def show_player_stocks(self):
 		return self.player_stocks
@@ -94,60 +108,88 @@ class Player(object):
 				self.player_stocks.pop(name, quantity)
 
 	def player_buying(self, name, quantity, price):
-		if self.enough_money(price):
-			if self.check_stock_in_list(name):
-				self.add_more_stock_in_list(name, quantity)
-			else: self.add_stock_in_list(name, quantity)
-			self.subtract_money(price)
-		else: print "You do not have enough money to buy stocks"
+		if self.check_stock_in_list(name):
+			self.add_more_stock_in_list(name, quantity)
+		else: self.add_stock_in_list(name, quantity)
+		self.subtract_money(price)
+
 
 	def player_selling(self, name, quantity, price):
-		if self.check_stock_in_list(name):
-			if self.quantity_check(name, quantity):
-				self.subtract_stock_in_list(name, quantity)
-				self.delete_list_value_zero()
-				self.add_money(price)
-			else: print "You do not have enough stocks to sell"
-		else: print "You do not own a given stock"
-
+		self.subtract_stock_in_list(name, quantity)
+		self.delete_list_value_zero()
+		self.add_money(price)
 
 class Game_Runner(object):
 
 	def __init__(self):
+		if os.path.isfile('whatgame.pickle'):
+			with open('whatgame.pickle', 'rb') as handle:
+				output = pickle.load(handle)
+				self.pickle = output
+		else:
+			self.pickle = ""
+
 		self.stock_manager = Stock_Manager()
 		self.player = Player()
 
+	def make_new_game(self, name):
+		if os.path.isfile('{}.pickle'.format(name)):
+			return "Given game name already exists"
+		else:
+			open("{}.pickle".format(name), 'wb')
+	
+	def start_game(self, name):
+		if os.path.isfile('{}.pickle'.format(name)):
+			with open('whatgame.pickle', 'wb') as handle:
+				pickle.dump(name, handle)
+		else:
+			print "There is no saved game as given name"
+	
+	def end_game(self):
+		with open('whatgame.pickle', 'wb') as handle:
+			pickle.dump("", handle)
+
 	def show_player_stocks(self):
-		print self.player.show_player_stocks()
+		return self.player.show_player_stocks()
 
 	def show_NASDAQ(self):
-		print self.stock_manager.show_NASDAQ()
+		return self.stock_manager.show_NASDAQ()
 
 	def show_money(self):
-		print self.player.show_money()
+		return self.player.show_money()
 
-	def buy_stock(self, list):
-		name = list[0]
-		quantity = list[1]
-		if quantity.isdigit():
-			if self.stock_manager.check_stock_exist_in_NASDAQ(name):
-				price = float(self.stock_manager.check_current_price_stock(name))
-				total_price = price * int(quantity)
-				self.player.player_buying(name, quantity, total_price)
-				self.show_money()
-				self.show_player_stocks()
-			else: print "Given stock does not exist"
-		else: print "Quantity must be an integer"
+	def buy_stock(self,name, quantity):
+		if self.pickle != "":
+			if quantity.isdigit():
+				if self.stock_manager.check_stock_exist_in_NASDAQ(name):
+					price = float(self.stock_manager.check_current_price_stock(name))
+					total_price = price * int(quantity)
+					if self.player.show_money() >= total_price:
+						self.player.player_buying(name, quantity, total_price)
+						output = (self.show_money(), self.show_player_stocks())
+						with open('{}.pickle'.format(self.pickle), 'wb') as handle:
+							pickle.dump(output, handle)
+						return output
+					else: return "You do not have enough money to buy stocks"
+				else: return "Given stock does not exist"
+			else: return "Quantity must be an integer"
+		else: return "You have to start game first"
 
-	def sell_stock(self, list):
-		name = list[0]
-		quantity = list[1]
-		if quantity.isdigit():
-			if self.stock_manager.check_stock_exist_in_NASDAQ(name):
-				price = float(self.stock_manager.check_current_price_stock(name))
-				total_price = price * int(quantity)
-				self.player.player_selling(name, quantity, total_price)
-				self.show_money()
-				self.show_player_stocks()
-			else: print "Given stock does not exist"
-		else: print "Quantity must be an integer"
+	def sell_stock(self, name, quantity):
+		if self.pickle != "":
+			if quantity.isdigit():
+				if self.stock_manager.check_stock_exist_in_NASDAQ(name):
+					price = float(self.stock_manager.check_current_price_stock(name))
+					total_price = price * int(quantity)
+					if self.player.check_stock_in_list(name):
+						if self.player.quantity_check(name, quantity):
+							self.player.player_selling(name, quantity, total_price)
+							output = (self.show_money(), self.show_player_stocks())
+							with open('{}.pickle'.format(self.pickle), 'wb') as handle:
+								pickle.dump(output, handle)
+							return output
+						else: return "You do not have enough stocks to sell"
+					else: return "You do not own a given stock"
+				else: return "Given stock does not exist"
+			else: return "Quantity must be an integer"
+		else: return "You have to start game first"
