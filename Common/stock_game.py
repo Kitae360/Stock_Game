@@ -91,38 +91,39 @@ class Player(object):
 				self.player_stocks.pop(name, quantity)
 
 	def player_buying(self, name, quantity, price):
-		if self.check_stock_in_list(name):
-			self.add_more_stock_in_list(name, quantity)
-		else: self.add_stock_in_list(name, quantity)
-		self.subtract_money(price)
-
+		if self.money >= price:
+			if self.check_stock_in_list(name):
+				self.add_more_stock_in_list(name, quantity)
+			else: 
+				self.add_stock_in_list(name, quantity)
+			self.subtract_money(price)
+			self.delete_list_value_zero()
 
 	def player_selling(self, name, quantity, price):
-		self.subtract_stock_in_list(name, quantity)
-		self.delete_list_value_zero()
-		self.add_money(price)
+		if quantity <= float(self.player_stocks.get(name)):
+			self.subtract_stock_in_list(name, quantity)
+			self.delete_list_value_zero()
+			self.add_money(price)
 
 class Game_Runner(object):
 
 	def __init__(self):
 		self.stock_manager = Stock_Manager()
-		if os.path.isfile('a.pickle'):
-			with open('a.pickle', 'rb') as handle:
-				self.player = pickle.load(handle)
-		else:
-			self.player = Player()
+		self.player = Player()
+	
+	def new_game(self, name):
+		return os.path.isfile('{}.pickle'.format(name))
 
-	def make_new_game(self, name):
-		if os.path.isfile('{}.pickle'.format(name)):
-			return "Given game name already exists"
-		else:
-			open("{}.pickle".format(name), 'wb')
-	
-	def start_game(self, name):
-		return "start"
-	
-	def end_game(self):
-		return "end"
+	def save_game(self, file_name):
+		with open('{}.pickle'.format(file_name), 'wb') as handle:
+			pickle.dump(self.player, handle)
+
+	def dump(self, file_name):
+		try:
+			with open('{}.pickle'.format(file_name), 'rb') as handle:
+				self.player = pickle.load(handle)
+		except Exception as e:
+			return e
 
 	def show_player_stocks(self):
 		return self.player.show_player_stocks()
@@ -134,33 +135,20 @@ class Game_Runner(object):
 		return self.player.show_money()
 
 	def buy_stock(self,name, quantity):
-			if quantity.isdigit():
-				if self.stock_manager.check_stock_exist_in_NASDAQ(name):
-					price = float(self.stock_manager.check_current_price_stock(name))
-					total_price = price * int(quantity)
-					if self.player.show_money() >= total_price:
-						self.player.player_buying(name, quantity, total_price)
-						output = (self.show_money(), self.show_player_stocks())
-						with open('a.pickle', 'wb') as handle:
-							pickle.dump(self.player, handle)
-						return output
-					else: return "You do not have enough money to buy stocks"
-				else: return "Given stock does not exist"
-			else: return "Quantity must be an integer"
+		price = float(self.stock_manager.check_current_price_stock(name))
+		total_price = price * int(quantity)
+		rounded_total_price = float(format(total_price, '.3f'))
+		self.player.player_buying(name, quantity, rounded_total_price)
+		output = (self.show_money(), self.show_player_stocks())
+		return output
 
 	def sell_stock(self, name, quantity):
-			if quantity.isdigit():
-				if self.stock_manager.check_stock_exist_in_NASDAQ(name):
-					price = float(self.stock_manager.check_current_price_stock(name))
-					total_price = price * int(quantity)
-					if self.player.check_stock_in_list(name):
-						if self.player.quantity_check(name, quantity):
-							self.player.player_selling(name, quantity, total_price)
-							output = (self.show_money(), self.show_player_stocks())
-							with open('a.pickle', 'wb') as handle:
-								pickle.dump(self.player, handle)
-							return output
-						else: return "You do not have enough stocks to sell"
-					else: return "You do not own a given stock"
-				else: return "Given stock does not exist"
-			else: return "Quantity must be an integer"
+		price = float(self.stock_manager.check_current_price_stock(name))
+		total_price = price * int(quantity)
+		rounded_total_price = float(format(total_price, '.3f'))
+		self.player.player_selling(name, quantity, rounded_total_price)
+		output = (self.show_money(), self.show_player_stocks())
+		return output
+
+	def check_price(self, name):
+		return float(self.stock_manager.check_current_price_stock(name))
