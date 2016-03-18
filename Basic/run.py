@@ -10,12 +10,12 @@ def main():
 	parser.add_argument(
 	'-buy',
 	nargs = '*', 
-	help = "Requires three arguments, name of the stock, quantity, game name")
+	help = "Requires three arguments, symbol of the stock, quantity, game name")
 
 	parser.add_argument(
 	'-sell',
 	nargs = '*', 
-	help = "Requires three arguments, name of the stock, quantity, game name")
+	help = "Requires three arguments, symbol of the stock, quantity, game name")
 
 	parser.add_argument(
 	'-check_owned_stocks',
@@ -35,7 +35,7 @@ def main():
 	parser.add_argument(
 	'-current_price',
 	nargs = '*', 
-	help = "Check the price of the stock. One argument required, stock name")
+	help = "Check the price of the stock. One argument required, stock symbol")
 
 	args = parser.parse_args()
 
