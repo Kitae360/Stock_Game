@@ -8,13 +8,25 @@ from yahoo_finance import Share
 import time
 import os.path
 
+class Trans_Warning(Gtk.Dialog):
+
+	def __init__(self, parent):
+	        Gtk.Dialog.__init__(self, "Warning", parent, 0,
+		(Gtk.STOCK_OK, Gtk.ResponseType.OK))
+
+		self.set_default_size(100, 80)
+
+		label = Gtk.Label("Transaction cannot be done")
+
+		box = self.get_content_area()
+		box.add(label)
+		self.show_all()
+
 class Stock_Name_Warning(Gtk.Dialog):
 
 	def __init__(self, parent):
 	        Gtk.Dialog.__init__(self, "Warning", parent, 0,
 		(Gtk.STOCK_OK, Gtk.ResponseType.OK))
-		self.player = stock_game.Player()
-		self.stock_manager = stock_game.Stock_Manager()
 
 		self.set_default_size(100, 80)
 
@@ -29,8 +41,6 @@ class Dialog_Name_Warning(Gtk.Dialog):
 	def __init__(self, parent):
 	        Gtk.Dialog.__init__(self, "Warning", parent, 0,
 		(Gtk.STOCK_OK, Gtk.ResponseType.OK))
-		self.player = stock_game.Player()
-		self.stock_manager = stock_game.Stock_Manager()
 
 		self.set_default_size(100, 80)
 
@@ -342,12 +352,8 @@ class MyWindow(Gtk.Window):
 			money = output[1]
 
 			dialog = Current_Account(self)
-			dialog.get_data(stocks, money)
+			dialog.get_data(money, stocks)
 			response = dialog.run()
-			dialog.destroy()
-		else:
-			dialog = Stock_Name_Warning(self)
-	        	response = dialog.run()
 			dialog.destroy()
 
 	def sell(self, button):
@@ -360,13 +366,10 @@ class MyWindow(Gtk.Window):
 			money = output[1]
 
 			dialog = Current_Account(self)
-			dialog.get_data(stocks, money)
+			dialog.get_data(money, stocks)
 			response = dialog.run()
 			dialog.destroy()
-		else:
-			dialog = Stock_Name_Warning(self)
-	        	response = dialog.run()
-			dialog.destroy()
+
 
 	def go_to_main_menu(self, button):
 		self.vbox.remove(self.label)
