@@ -8,6 +8,22 @@ from yahoo_finance import Share
 import time
 import os.path
 
+class Stock_Name_Warning(Gtk.Dialog):
+
+	def __init__(self, parent):
+	        Gtk.Dialog.__init__(self, "Warning", parent, 0,
+		(Gtk.STOCK_OK, Gtk.ResponseType.OK))
+		self.player = stock_game.Player()
+		self.stock_manager = stock_game.Stock_Manager()
+
+		self.set_default_size(100, 80)
+
+		label = Gtk.Label("Stock Name is invalid!")
+
+		box = self.get_content_area()
+		box.add(label)
+		self.show_all()
+
 class Dialog_Name_Warning(Gtk.Dialog):
 
 	def __init__(self, parent):
@@ -270,20 +286,19 @@ class MyWindow(Gtk.Window):
 		response = dialog.run()
 		dialog.destroy()
 
-	def search_nasdaq(self, button):
-		self.vbox.remove(self.label)
-		self.vbox.remove(self.button1)
-		self.vbox.remove(self.button2)
-		self.vbox.remove(self.button3)
-		self.vbox.remove(self.button4)
+	def price_page(self):
 
-		self.label = Gtk.Label("Type the Name & Click The Action You Want")
+		self.label = Gtk.Label("Type the Name, Date & Click The Action You Want")
 	        self.vbox.pack_start(self.label, True, True, 0)
 
 		self.name_combo = Gtk.ComboBox.new_with_model_and_entry(self.name_store)
 		self.name_combo.connect("changed", self.on_name_combo_changed)
 		self.name_combo.set_entry_text_column(1)
 		self.vbox.pack_start(self.name_combo, False, False, 0)
+
+		self.calendar = Gtk.Calendar()
+		self.calendar.connect("day-selected", self.calendar_input)
+		self.vbox.pack_start(self.calendar, True, True, 0)
 
 	        self.button = Gtk.Button.new_with_label("Check Current Price")
 	        self.button.connect("clicked", self.current_price)
@@ -297,6 +312,14 @@ class MyWindow(Gtk.Window):
 	        self.button3.connect("clicked", self.go_to_main_menu2)
 	        self.vbox.pack_start(self.button3, True, True, 0)
 
+
+	def search_nasdaq(self, button):
+		self.vbox.remove(self.label)
+		self.vbox.remove(self.button1)
+		self.vbox.remove(self.button2)
+		self.vbox.remove(self.button3)
+		self.vbox.remove(self.button4)
+		self.price_page()
 		win.show_all()
 
 	def save_quit(self, button):
@@ -322,6 +345,10 @@ class MyWindow(Gtk.Window):
 			dialog.get_data(stocks, money)
 			response = dialog.run()
 			dialog.destroy()
+		else:
+			dialog = Stock_Name_Warning(self)
+	        	response = dialog.run()
+			dialog.destroy()
 
 	def sell(self, button):
 		stock_quantity = self.spinbutton.get_value_as_int()
@@ -335,6 +362,10 @@ class MyWindow(Gtk.Window):
 			dialog = Current_Account(self)
 			dialog.get_data(stocks, money)
 			response = dialog.run()
+			dialog.destroy()
+		else:
+			dialog = Stock_Name_Warning(self)
+	        	response = dialog.run()
 			dialog.destroy()
 
 	def go_to_main_menu(self, button):
@@ -354,26 +385,87 @@ class MyWindow(Gtk.Window):
 		self.vbox.remove(self.button2)
 		self.vbox.remove(self.button3)
 		self.vbox.remove(self.name_combo)
+		self.vbox.remove(self.calendar)
 		self.game_main_menu()
 		win.show_all()
 
 	def current_price(self, button):
 		stock_name = self.name_combo.get_child().get_text()
 		stock_symbol = self.stock_dic.get(stock_name)
-		price = self.interface.stock_price(stock_symbol)
-	        dialog = Check_Price(self)
-		dialog.get_data(stock_name, stock_symbol, price)
-	        response = dialog.run()
-		dialog.destroy()
+		if stock_symbol != None:
+			price = self.interface.stock_price(stock_symbol)
+	        	dialog = Check_Price(self)
+			dialog.get_data(stock_name, stock_symbol, price)
+	        	response = dialog.run()
+			dialog.destroy()
+		else:
+			dialog = Stock_Name_Warning(self)
+	        	response = dialog.run()
+			dialog.destroy()
 
 	def price_graph(self, button):
 		stock_name = self.name_combo.get_child().get_text()
 		stock_symbol = self.stock_dic.get(stock_name)
+		if stock_symbol != None:
+			date = self.calendar.get_date()
+			self.graph = Graph()
+			self.graph.collect_graph_data(stock_symbol, date)
+			self.graph.price_list_collect()
+			self.graph.draw_graph()
+		else:
+			dialog = Stock_Name_Warning(self)
+	        	response = dialog.run()
+			dialog.destroy()
+
+	def calendar_input(self, calendar):
+		date = calendar.get_date()
 
 	def on_name_combo_changed(self, combo):
 		entry = combo.get_child()
 		self.stock_name = entry.get_text()
 
+class Graph(object):
+
+	def __init__(self):
+		self.game = stock_game.Stock_Manager()
+		self.stock_list = self.game.show_NASDAQ()
+		self.selected_date = ""
+		self.today = ""
+		self.symbol = ""
+		self.price_list = []
+
+	def collect_graph_data(self, symbol, date):
+		year = date[0]
+		month = date[1] + 1
+		day = date[2]
+		self.selected_date = "{}-{}-{}".format(year, month, day)
+		self.today = (time.strftime("%Y-%m-%d"))
+		self.symbol = symbol
+
+	def price_list_collect(self):
+		stock = Share(self.symbol)
+		history = stock.get_historical(self.selected_date, self.today)
+		self.data_num = len(history)
+		while self.data_num > 0:
+			one = history[self.data_num -1]
+			price = one['High']
+			self.price_list.append(float(price))
+			self.data_num = self.data_num - 1
+
+	def draw_graph(self):
+		average_price = sum(self.price_list)/float(len(self.price_list))
+		number = int(len(self.price_list))
+		x_axis = []
+		input_num = 1
+		while number > 0:
+			x_axis.append(input_num)
+			input_num = input_num + 1
+			number = number - 1
+		plt.plot(x_axis, self.price_list, 'b')
+		plt.ylabel('Price')
+		plt.xlabel('Days Ago')
+		plt.axis([int(len(self.price_list)) + 1, 0, min(self.price_list) - 0.5, max(self.price_list) + 0.5])
+		plt.show()
 
 class Interface(object):
 	
